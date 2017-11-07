@@ -15,6 +15,10 @@
     <!-- Referencia al código fuente y a los estilos del complemento MousePosition -->	 
     <script type="text/javascript" src="https://cdn.rawgit.com/ardhi/Leaflet.MousePosition/master/src/L.Control.MousePosition.js"></script>
     <link rel="stylesheet" href="https://cdn.rawgit.com/ardhi/Leaflet.MousePosition/master/src/L.Control.MousePosition.css"/>	  
+	
+	<!-- Referencia al complemento Leaflet-providers -->	 
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-providers/1.1.7/leaflet-providers.js"></script>
+	
   </head>
 
   <body>
@@ -30,6 +34,21 @@
         attribution: '<a href="http://www.openstreetmap.org/">OpenStreetMap</a>'
       });
       osm.addTo(mapa);
+	  
+	  // Capa WaterColor de tipo L.tileLayer definida con el complemento Leaflet-providers
+      var sta = L.tileLayer.provider('Stamen.Watercolor');
+      sta.addTo(mapa);
+	
+      // Capa OSM Surfer de tipo L.tileLayer definida con el complemento Leaflet-providers
+      var osmS = L.tileLayer('https://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
+	maxZoom: 20,
+	attribution: 'Imagery from <a href="http://giscience.uni-hd.de/">GIScience Research Group @ University of Heidelberg</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+});
+      osmS.addTo(mapa);
+	  
+	  // Capa NASAnight de tipo L.tileLayer definida con el complemento Leaflet-providers
+      var NASAn = L.tileLayer.provider('NASAGIBS.ViirsEarthAtNight2012');
+      NASAn.addTo(mapa);
 	    
       // retorna un color con base en la cantidad de especies
       function color(d) {
@@ -62,17 +81,36 @@
           };
         },
 	      
-	onEachFeature: pobTotal //+ onEachFeature: nombrecanton
+	onEachFeature: pobTotal
       })
       cantones2014.addTo(mapa);
+	  
+	  
+	  var wms1Layer = L.tileLayer.wms('http://geos.snitcr.go.cr/be/IGN_50/wms?', {
+    layers: 'IGN_50:limiteprovincial_50k'
+}).addTo(mapa);
+
+	  var wms2Layer = L.tileLayer.wms('http://geos.snitcr.go.cr/be/IGN_50/wms?', {
+    layers: 'IGN_50:limitedistrital_50k'
+}).addTo(mapa);
+
+	  var wms3Layer = L.tileLayer.wms('http://geos.snitcr.go.cr/be/IGN_RI/wms?', {
+    layers: 'zona_catastrada'
+}).addTo(mapa);
 	    
 	    
    	    
       var baseLayers = {
-	"OpenStreetMap": osm
+	"OpenStreetMap": osm,
+	"Stamen Watercolor" : sta,
+	"OSM Sufer": osmS,
+	"NASA Night": NASAn
       };
       var overlays = {
-	"Cantones de Costa Rica": cantones2014
+	"Provincias": wms1Layer,
+	"Cantones": cantones2014,
+	"Distritos": wms2Layer,
+	"Mapa catastrado": wms3Layer
       };
       L.control.layers(baseLayers, overlays).addTo(mapa);
 	    
